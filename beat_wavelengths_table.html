@@ -10,7 +10,19 @@
     <title>Beat Wavelengths Description</title>
 </head>
 <body>
-<h2>Beat wavelengths for LPmn modes</h2>
+<h2>Description</h2>
+<p>
+Given a frequency \( f \), the wave number in free space \( k \) is calculated using the formula:
+</p>
+\[
+k = \frac{2 \pi f}{c}
+\]
+<p>
+For a frequency \( f = 170 \) GHz, and taking the speed of light \( c \), we can compute the wave number \( k \).
+</p>
+<p>
+The guide radius is given by \( a = 17.64 \) mm. With this, the product \( ka \) is approximately 5, which is an important parameter for waveguide analysis.
+</p>
 <p>
 The propagation constants, \( \beta_{mn} \), for different modes in a waveguide are calculated based on the cut-off wave number \( k_c \) and the wave number in free space \( k \) using the formula:
 </p>
@@ -21,8 +33,11 @@ The propagation constants, \( \beta_{mn} \), for different modes in a waveguide 
 Where \( k_c \) is given by:
 </p>
 \[
-k_{c_{mn}} = \frac{{\text{{zero of the Bessel function for mode }} mn}}{a}
+k_{c_{mn}} = \frac{j_{mn}}{a}
 \]
+<p>
+Here, \( j_{mn} \) represents the nth zero of the mth Bessel function.
+</p>
 <p>
 Given two different modes with propagation constants \( \beta_{m1n1} \) and \( \beta_{m2n2} \), the beat wavelength between these modes is given by:
 </p>
