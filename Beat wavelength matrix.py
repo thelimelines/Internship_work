@@ -89,4 +89,4 @@ styled_modified_df = modified_df.style.applymap(
     lambda val: modified_color_gradient(val, min_value, max_value)
 ).format(format_func).set_caption("Beat Wavelengths (in meters)")
 
-styled_modified_df.to_html("beat_wavelengths_table.html")
+styled_modified_df.to_html("beat_wavelengths_table_only.html")
