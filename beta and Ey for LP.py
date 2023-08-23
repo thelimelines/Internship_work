@@ -66,5 +66,5 @@ m, n = 1, 1
 beta_01, X_01 = propagation_constant(frequency, a, m, n)
 Ey_01_expression = Ey_expression(a, X_01, m, 'odd')
 
-print(beta_01)
+print(f"{beta_01} rad/m")
 print(Ey_01_expression)

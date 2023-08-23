@@ -24,7 +24,7 @@ def beat_wavelength_with_frequency(f, a, m1, n1, m2, n2):
 
 # Provided values
 f = 170e9  # 170 GHz in Hz
-a = 17.64e-3  # 17.64 mm in meters
+a = 25e-3  # 50 mm diameter in meters
 m1, n1 = 0, 1
 m2, n2 = 1, 1
 
