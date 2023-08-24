@@ -73,7 +73,7 @@ def format_func(x):
 
 # Provided values
 f = 170e9  # 170 GHz in Hz
-a = (25e-3)  # 50 mm diameter in meters
+a = 25e-3  # 50 mm diameter in meters
 m_values = list(range(0, 5))
 n_values = list(range(1, 5))
 

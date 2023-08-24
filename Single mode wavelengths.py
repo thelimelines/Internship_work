@@ -18,13 +18,13 @@ def mode_wavelength(f, a, m, n):
     # Calculate the wavelength
     mode_lambda = 2 * np.pi / np.abs(beta_mn)
     
-    result_string = f"The wavelength for LP{m}{n} is {mode_lambda:.6f} m with a cutoff radius of {lambdac_mn*1000} mm"
+    result_string = f"The wavelength for LP{m}{n} is {mode_lambda:.6f} m with a hole cutoff radius of {lambdac_mn*1000} mm"
     return result_string
 
 # Provided values
 f = 170e9  # 170 GHz in Hz
-a = 25E-3  # 50 mm diameter in meters
-m, n = 4, 4
+a = 7.01668E-3  # 50 mm diameter in meters
+m, n = 0,1
 
 # Calculate and print the beat wavelength for LP01 and LP11
 wavelength_result = mode_wavelength(f, a, m, n)

@@ -48,7 +48,7 @@ def Ey_expression(a, X_mn, m, polarization='odd'):
     trig_function = 'cos' if polarization == 'odd' else 'sin'
     
     # Radial dependency
-    radial_dependency = f"besselj({m}, {X_mn/a} * {r_expression})"
+    radial_dependency = f"besselj({m}, {X_mn/a} [m^-1] * {r_expression})"
     
     # Azimuthal dependency
     azimuthal_dependency = f"{trig_function}({m} * {phi_expression})"
@@ -60,8 +60,8 @@ def Ey_expression(a, X_mn, m, polarization='odd'):
 
 # Calculate for LP_01 mode at 170 GHz with a radius of 8.82 mm
 frequency = 170e9
-a = 8.82e-3
-m, n = 1, 1
+a = 7.01668E-3
+m, n = 4, 3
 
 beta_01, X_01 = propagation_constant(frequency, a, m, n)
 Ey_01_expression = Ey_expression(a, X_01, m, 'odd')
