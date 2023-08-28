@@ -42,9 +42,9 @@ def compute_power_for_phi_final(phi, X_mn, m, a, chord_length, P_total, Ey_max, 
 frequency = 170e9  # Frequency of the wave
 a = 7.01668E-3  # Radius of the waveguide
 m, n = 4, 4  # Mode numbers
-chord_length = 1e-3  # Length of the chord in the waveguide
+chord_length = 1e-3  # Length of the chord in the waveguide (hole size)
 P_total = 1e6  # Total power in the waveguide
-phi_values_refined_range = np.linspace(0, np.pi/2, 500)  # Azimuthal angles for which power will be computed
+phi_values_refined_range = np.linspace(0, np.pi, 500)  # Azimuthal angles for which power will be computed
 decay_distance = 1.43e-3  # Distance over which evanescent decay occurs
 
 # Calculations
