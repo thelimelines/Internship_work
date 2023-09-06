@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit, least_squares
 
 # Load the data
-data = pd.read_csv('mode_data_test.csv')
+data = pd.read_csv('Reconstruction algorithms\mode_data_test.csv')
 
 # Define the even symmetric Fourier series function
 def even_symmetric_fourier_series(x, *coeffs):
