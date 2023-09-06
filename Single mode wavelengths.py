@@ -22,8 +22,8 @@ def mode_wavelength(f, a, m, n):
     return result_string
 
 # Provided values
-f = 170e9  # 170 GHz in Hz
-a = 7.01668E-3  # 50 mm diameter in meters
+f = 170e9  # 170 GHz
+a = 7.01668E-3  # radius in meters
 m, n = 0,1
 
 # Calculate and print the beat wavelength for LP01 and LP11

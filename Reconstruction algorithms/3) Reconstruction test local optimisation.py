@@ -52,12 +52,12 @@ def simulate_signal_with_polarization_shift(x_values, fourier_coefficients, weig
 
 # Generate the simulated signal
 x_values = np.linspace(0, 180, 1000)
-weights = [1, 2, 3]
-polarization_shifts = [0, 30, 15]
+weights = [100, 2, 1]
+polarization_shifts = [0, 60, 10]
 simulated_signal_values = simulate_signal_with_polarization_shift(x_values, even_symmetric_fourier_coefficients, weights, polarization_shifts)
 
 # Perform sampling at n_points equally spaced points
-n_points = 6
+n_points = 7
 sample_indices = np.linspace(0, len(x_values) - 1, n_points, dtype=int)
 sampled_x = x_values[sample_indices]
 sampled_y = simulated_signal_values[sample_indices]
