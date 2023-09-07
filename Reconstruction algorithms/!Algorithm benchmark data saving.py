@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit, dual_annealing
 import os
+import time
 
 # Function definitions from prior work
 def even_symmetric_fourier_series(x, *coeffs):
@@ -139,7 +140,10 @@ output_folder = "Reconstruction algorithms\Benchmark_data/"
 avg_percent_diffs = []
 all_percent_diffs = []
 trial_count = 0 # Counter variable
-trials = 10 # Number of trials per sample
+trials = 50 # Number of trials per sample
+total_trials = (13 - 3) * trials #TO BE REPLACED WITH RANGE VARIABLES
+start_time = time.time()
+bar_length = 100
 
 # Delete all files in the output folder
 for filename in os.listdir(output_folder):
@@ -239,11 +243,26 @@ for n_points in range(3, 13):
         # Calculate total average percentage difference for this trial
         total_percent_diff = np.mean(np.concatenate([weight_percent_diffs, shift_percent_diffs]))
         percent_diffs_for_this_n.append(total_percent_diff)
+
+        # Calculate elapsed and estimated remaining time
+        elapsed_time = time.time() - start_time
+        estimated_remaining_time = (elapsed_time / trial_count) * (total_trials - trial_count)
+
+        # Update the progress bar
+        progress = (trial_count / total_trials)
+        arrow = '=' * int(round(progress * bar_length) - 1)
+        spaces = ' ' * (bar_length - len(arrow))
+
+        # Print the progress bar
+        print(f"[{arrow + spaces}] {progress * 100:.2f}% - Elapsed: {elapsed_time:.2f}s - Remaining: {estimated_remaining_time:.2f}s", end='\r')
+
     
     # Calculate and store the average percentage difference for this n_points
     avg_percent_diff = np.mean(percent_diffs_for_this_n)
     avg_percent_diffs.append(avg_percent_diff)
     all_percent_diffs.extend(percent_diffs_for_this_n)
+
+print("\nCompleted.")
 
 # Save the summary data to a CSV file in the output folder
 pd.DataFrame({'avg_percent_diffs': avg_percent_diffs}).to_csv(f"{output_folder}avg_percent_diffs.csv", index=False)
