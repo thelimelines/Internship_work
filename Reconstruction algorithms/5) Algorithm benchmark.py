@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit, dual_annealing
+import pickle
 
-# Function definitions
+# Function definitions from prior work
 def even_symmetric_fourier_series(x, *coeffs):
     a0 = coeffs[0]
     result = a0
@@ -29,6 +30,46 @@ def objective_scalar(params, x, y, fourier_coefficients):
     residual = y - simulated_y
     return np.sum(residual ** 2)
 
+# Define function to plot the original and recovered signals along with their components
+def plot_signals(x_values, original_signal, original_components, recovered_signal, recovered_components, sampled_x=None, sampled_y=None):
+    fig, axes = plt.subplots(1, 2, figsize=(18, 8))
+    
+    # Plot the original simulated signal and its components
+    axes[0].plot(x_values, original_signal, label='Original Signal', linewidth=2)
+    for component, label in original_components:
+        axes[0].plot(x_values, component, linestyle='--', label=label)
+    axes[0].set_xlabel('Polarization (degrees)')
+    axes[0].set_ylabel('Power (W)')
+    axes[0].set_title('Original Signal and Components')
+    axes[0].legend()
+    
+    # Plot the recovered signal and its components
+    axes[1].plot(x_values, original_signal, label='Original Signal', linewidth=2)
+    if sampled_x is not None and sampled_y is not None:
+        axes[1].scatter(sampled_x, sampled_y, label='Sampled Points', color='red', s=50, zorder=5)
+    for component, label in recovered_components:
+        axes[1].plot(x_values, component, linestyle='--', label=label)
+    axes[1].plot(x_values, recovered_signal, label='Recovered Signal', linewidth=2)
+    axes[1].set_xlabel('Polarization (degrees)')
+    axes[1].set_ylabel('Power (W)')
+    axes[1].set_title('Recovered Signal and Components')
+    axes[1].legend()
+    
+    plt.tight_layout()
+    plt.show()
+
+# Event handler for pick events
+def on_pick(event):
+    ind = event.ind[0]  # Get the index of the clicked point
+    trial_info = trial_data[ind]  # Retrieve the corresponding trial data
+    plot_signals(trial_info['x_values'], 
+                 trial_info['original_signal'], 
+                 trial_info['original_components'], 
+                 trial_info['recovered_signal'], 
+                 trial_info['recovered_components'],
+                 trial_info['sampled_x'],
+                 trial_info['sampled_y'])
+
 # Load the data
 data = pd.read_csv('Reconstruction algorithms\mode_data_test.csv')
 unique_modes = data[['Mode m', 'mode n']].drop_duplicates().values
@@ -52,27 +93,16 @@ all_percent_diffs = []
 # Storage for trial data and plots
 trial_data = {}
 
-# Event handler for pick events
-def on_pick(event):
-    ind = event.ind[0]  # Get the index of the clicked point
-    trial_info = trial_data[ind]  # Retrieve the corresponding trial data
-    plot_signals(trial_info['x_values'], 
-                 trial_info['original_signal'], 
-                 trial_info['original_components'], 
-                 trial_info['recovered_signal'], 
-                 trial_info['recovered_components'],
-                 trial_info['sampled_x'],
-                 trial_info['sampled_y'])
-
 # Initialize result storage
 avg_percent_diffs = []
 all_percent_diffs = []
-trial_count = 0
+trial_count = 0 # Counter variable
+trials = 10 # Number of trials per sample
 
 # Loop over number of sample points
 for n_points in range(3, 13):
     percent_diffs_for_this_n = []
-    for trial in range(100):
+    for trial in range(trials):
         # Generate random weights and shifts
         original_weights = np.round(np.random.uniform(0, 100, size=len(unique_modes)), 2)
         original_shifts = np.round(np.random.uniform(0, 180, size=len(unique_modes)), 2)
@@ -137,37 +167,9 @@ for n_points in range(3, 13):
     avg_percent_diffs.append(avg_percent_diff)
     all_percent_diffs.extend(percent_diffs_for_this_n)
 
-# Define function to plot the original and recovered signals along with their components
-def plot_signals(x_values, original_signal, original_components, recovered_signal, recovered_components, sampled_x=None, sampled_y=None):
-    fig, axes = plt.subplots(1, 2, figsize=(18, 8))
-    
-    # Plot the original simulated signal and its components
-    axes[0].plot(x_values, original_signal, label='Original Signal', linewidth=2)
-    for component, label in original_components:
-        axes[0].plot(x_values, component, linestyle='--', label=label)
-    axes[0].set_xlabel('Polarization (degrees)')
-    axes[0].set_ylabel('Power (W)')
-    axes[0].set_title('Original Signal and Components')
-    axes[0].legend()
-    
-    # Plot the recovered signal and its components
-    axes[1].plot(x_values, recovered_signal, label='Recovered Signal', linewidth=2)
-    if sampled_x is not None and sampled_y is not None:
-        axes[1].scatter(sampled_x, sampled_y, label='Sampled Points', color='red', s=50, zorder=5)
-    for component, label in recovered_components:
-        axes[1].plot(x_values, component, linestyle='--', label=label)
-    axes[1].plot(x_values, original_signal, label='Original Signal', linewidth=2)
-    axes[1].set_xlabel('Polarization (degrees)')
-    axes[1].set_ylabel('Power (W)')
-    axes[1].set_title('Recovered Signal and Components')
-    axes[1].legend()
-    
-    plt.tight_layout()
-    plt.show()
-
 # Re-run the plotting with pick event
 fig, ax = plt.subplots(figsize=(10, 6))
-sc = ax.scatter(np.repeat(np.arange(3, 13), 100), all_percent_diffs, c='blue', alpha=0.5, picker=True)
+sc = ax.scatter(np.repeat(np.arange(3, 13), trials), all_percent_diffs, c='blue', alpha=0.5, picker=True)
 ax.plot(np.arange(3, 13), avg_percent_diffs, c='red', marker='o')
 ax.set_xlabel('Number of Sample Points')
 ax.set_ylabel('Total Average % Difference')
@@ -176,3 +178,5 @@ ax.grid(True)
 
 fig.canvas.callbacks.connect('pick_event', on_pick)
 plt.show()
+with open("Reconstruction algorithms\Algorithm_Benchmark_Figure.pkl", "wb") as f:
+    pickle.dump(fig, f)
