@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+# Load the data
+data = pd.read_csv('Reconstruction algorithms\mode_data_test.csv')
+
 # Define the even symmetric Fourier series function
 def even_symmetric_fourier_series(x, *coeffs):
     """Even symmetric Fourier series representation using only cosine terms."""
@@ -20,8 +23,6 @@ def generate_equation(coeffs):
     for n, coeff in enumerate(coeffs[1:], 1):
         equation += f" + {coeff:.3f}cos({2*n}x)"
     return equation
-
-data = pd.read_csv('Reconstruction algorithms\mode_data_test.csv')
 
 # Identify unique modes in the data
 unique_modes = data[['Mode m', 'mode n']].drop_duplicates().values
@@ -82,6 +83,3 @@ for idx, mode in enumerate(unique_modes, 1):
 
 plt.tight_layout()
 plt.show()
-
-# Output the equations
-print(equations)

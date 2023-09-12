@@ -9,7 +9,6 @@ data = pd.read_csv('Reconstruction algorithms\mode_data_test.csv')
 
 # Define the even symmetric Fourier series function
 def even_symmetric_fourier_series(x, *coeffs):
-    """Even symmetric Fourier series representation using only cosine terms."""
     a0 = coeffs[0]
     result = a0
     for n in range(1, len(coeffs)):
@@ -17,41 +16,22 @@ def even_symmetric_fourier_series(x, *coeffs):
         result += an * np.cos(2 * n * np.pi * x / 180)
     return result
 
-# Generate equations for each mode's fit
-def generate_equation(coeffs):
-    """Generate the equation string for a given set of Fourier coefficients."""
-    equation = f"y(x) = {coeffs[0]:.3f}"
-    for n, coeff in enumerate(coeffs[1:], 1):
-        equation += f" + {coeff:.3f}cos({2*n}x)"
-    return equation
-
 # Identify unique modes in the data
 unique_modes = data[['Mode m', 'mode n']].drop_duplicates().values
 
 # Initialize a dictionary to store Fourier coefficients for each mode
 even_symmetric_fourier_coefficients = {}
-equations = {}
 
 # Fit the even symmetric Fourier series for each unique mode using data in the range [0, 90]
 for mode in unique_modes:
     m, n = mode
     mode_data = data[(data['Mode m'] == m) & (data['mode n'] == n)]
-    
-    # Adjust the number of terms based on m
     n_terms_adjusted = m + 1
-    
-    # Filter data for x in [0, 90]
     mode_data = mode_data[mode_data['Polarization'] <= 90]
-    
     x_data = mode_data['Polarization'].values
     y_data = np.nanmean([mode_data['Power1'].values, mode_data['Power2'].values], axis=0)
-    
-    # Fit the Fourier series to the data with adjusted number of terms
     popt, _ = curve_fit(even_symmetric_fourier_series, x_data, y_data, p0=[1.0] + [0.0] * n_terms_adjusted)
     even_symmetric_fourier_coefficients[(m, n)] = popt
-
-    # Generate and store the equation for this mode
-    equations[(m, n)] = generate_equation(popt)
 
 # Plot the results
 plt.figure(figsize=(15, 12))

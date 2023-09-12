@@ -1,8 +1,0 @@
-Original Labels:
-51.46x LP01 at 155.06 deg shift
-6.99x LP11 at 164.63 deg shift
-24.13x LP21 at 169.14 deg shift
-Recovered Labels:
-24.83x LP01 at 107.95 deg shift
-8.09x LP11 at 75.32 deg shift
-25.67x LP21 at 169.19 deg shift

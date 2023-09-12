@@ -63,7 +63,7 @@ def plot_signals(x_values, original_signal, original_components, recovered_signa
 
 # Event handler for pick events
 def on_pick(event):
-    ind = event.ind[0]  # Get the index of the clicked point
+    ind = event.ind[0]+1  # Get the index of the clicked point
 
     # Load the trial data from the corresponding CSV file
     df_loaded = pd.read_csv(f"{output_folder}trial_{ind}.csv")
@@ -128,19 +128,17 @@ for mode in unique_modes:
     popt, _ = curve_fit(even_symmetric_fourier_series, x_data, y_data, p0=[1.0] + [0.0] * n_terms_adjusted)
     even_symmetric_fourier_coefficients_corrected[(m, n)] = popt
 
-# Initialize result storage
-avg_percent_diffs = []
-all_percent_diffs = []
+# Initialize result storage for SSE
+avg_sse_errors = []
+all_sse_errors = []
 
 # Storage for trial data and plots
 trial_data = {}
 output_folder = "Reconstruction algorithms\Benchmark_data/"
 
 # Initialize result storage
-avg_percent_diffs = []
-all_percent_diffs = []
 trial_count = 0 # Counter variable
-trials = 50 # Number of trials per sample
+trials = 10 # Number of trials per sample
 total_trials = (13 - 3) * trials #TO BE REPLACED WITH RANGE VARIABLES
 start_time = time.time()
 bar_length = 100
@@ -156,8 +154,10 @@ for filename in os.listdir(output_folder):
 
 # Loop over number of sample points
 for n_points in range(3, 13):
+    sse_errors_for_this_n = []
     percent_diffs_for_this_n = []
     for trial in range(trials):
+        trial_count += 1
         # Generate random weights and shifts
         original_weights = np.round(np.random.uniform(0, 100, size=len(unique_modes)), 2)
         original_shifts = np.round(np.random.uniform(0, 180, size=len(unique_modes)), 2)
@@ -181,7 +181,7 @@ for n_points in range(3, 13):
         
         # Optimization
         bounds = [(0, max(original_weights))] * len(unique_modes) + [(0, 180)] * len(unique_modes)
-        result = dual_annealing(objective_scalar, bounds, args=(sampled_x, sampled_y, even_symmetric_fourier_coefficients_corrected), maxiter=100, initial_temp=5230)
+        result = dual_annealing(objective_scalar, bounds, args=(sampled_x, sampled_y, even_symmetric_fourier_coefficients_corrected), maxiter=10, initial_temp=5230)
         recovered_params = result.x
         recovered_weights = recovered_params[:len(unique_modes)]
         recovered_shifts = recovered_params[len(unique_modes):]
@@ -205,7 +205,6 @@ for n_points in range(3, 13):
             'sampled_x': sampled_x,
             'sampled_y': sampled_y
         }
-        trial_count += 1
 
         # Save the trial data as a CSV file
         df_to_save = pd.DataFrame({
@@ -234,15 +233,11 @@ for n_points in range(3, 13):
             label_file.write("\nRecovered Labels:\n")
             label_file.write("\n".join(recovered_labels))
 
-        # Compute percentage differences
-        weight_percent_diffs = np.abs((recovered_weights - original_weights) / original_weights) * 100
-        shift_percent_diffs = np.abs((recovered_shifts - original_shifts))  # Difference in degrees
-        shift_percent_diffs = np.where(shift_percent_diffs > 90, 180 - shift_percent_diffs, shift_percent_diffs)  # Map to [0, 90]
-        shift_percent_diffs = (shift_percent_diffs / 90) * 100  # Convert to percentage
+        # Compute the sum of squared errors (SSE)
+        sse = np.sum((original_signal_values - recovered_signal_values)**2)
         
-        # Calculate total average percentage difference for this trial
-        total_percent_diff = np.mean(np.concatenate([weight_percent_diffs, shift_percent_diffs]))
-        percent_diffs_for_this_n.append(total_percent_diff)
+        # Append the SSE to the list
+        all_sse_errors.append(sse)
 
         # Calculate elapsed and estimated remaining time
         elapsed_time = time.time() - start_time
@@ -257,25 +252,23 @@ for n_points in range(3, 13):
         print(f"[{arrow + spaces}] {progress * 100:.2f}% - Elapsed: {elapsed_time:.2f}s - Remaining: {estimated_remaining_time:.2f}s", end='\r')
 
     
-    # Calculate and store the average percentage difference for this n_points
-    avg_percent_diff = np.mean(percent_diffs_for_this_n)
-    avg_percent_diffs.append(avg_percent_diff)
-    all_percent_diffs.extend(percent_diffs_for_this_n)
+    # Calculate and store the average SSE for this n_points
+    avg_sse_error = np.mean(all_sse_errors[-trials:])  # Last 'trials' number of entries
+    avg_sse_errors.append(avg_sse_error)
 
 print("\nCompleted.")
 
 # Save the summary data to a CSV file in the output folder
-pd.DataFrame({'avg_percent_diffs': avg_percent_diffs}).to_csv(f"{output_folder}avg_percent_diffs.csv", index=False)
-pd.DataFrame({'all_percent_diffs': all_percent_diffs}).to_csv(f"{output_folder}all_percent_diffs.csv", index=False)
+pd.DataFrame({'avg_sse_errors': avg_sse_errors}).to_csv(f"{output_folder}avg_sse_errors.csv", index=False)
+pd.DataFrame({'all_sse_errors': all_sse_errors}).to_csv(f"{output_folder}all_sse_errors.csv", index=False)
 
-
-# Re-run the plotting with pick event
+# Re-run the plotting with pick event, now using SSE
 fig, ax = plt.subplots(figsize=(10, 6))
-sc = ax.scatter(np.repeat(np.arange(3, 13), trials), all_percent_diffs, c='blue', alpha=0.5, picker=True)
-ax.plot(np.arange(3, 13), avg_percent_diffs, c='red', marker='o')
+sc = ax.scatter(np.repeat(np.arange(3, 13), trials), all_sse_errors, c='blue', alpha=0.5, picker=True)
+ax.plot(np.arange(3, 13), avg_sse_errors, c='red', marker='o')
 ax.set_xlabel('Number of Sample Points')
-ax.set_ylabel('Total Average % Difference')
-ax.set_title('Total Average % Difference vs Number of Sample Points')
+ax.set_ylabel('Total Average Sum of Squared Errors (W^2)')
+ax.set_title('Total Average Sum of Squared Errors vs Number of Sample Points')
 ax.grid(True)
 
 fig.canvas.callbacks.connect('pick_event', on_pick)

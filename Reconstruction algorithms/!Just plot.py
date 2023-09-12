@@ -34,7 +34,7 @@ def plot_signals(x_values, original_signal, original_components, recovered_signa
 
 # Event handler for pick events
 def on_pick(event,input_folder):
-    ind = event.ind[0]  # Get the index of the clicked point
+    ind = event.ind[0]+1  # Get the index of the clicked point
 
     # Load the trial data from the corresponding CSV file
     df_loaded = pd.read_csv(f"{input_folder}trial_{ind}.csv")
@@ -86,16 +86,16 @@ def on_pick(event,input_folder):
 input_folder="Reconstruction algorithms\Benchmark_data/"
 
 # Load the summary data for the main plot from separate CSV files
-avg_percent_diffs = pd.read_csv(f"{input_folder}avg_percent_diffs.csv")['avg_percent_diffs'].values
-all_percent_diffs = pd.read_csv(f"{input_folder}all_percent_diffs.csv")['all_percent_diffs'].values
+avg_sse_errors = pd.read_csv(f"{input_folder}avg_sse_errors.csv")['avg_sse_errors'].values
+all_sse_errors = pd.read_csv(f"{input_folder}all_sse_errors.csv")['all_sse_errors'].values
 
 # Create the main interactive plot
 fig, ax = plt.subplots(figsize=(10, 6))
-sc = ax.scatter(np.repeat(np.arange(3, 13), len(all_percent_diffs) // 10), all_percent_diffs, c='blue', alpha=0.5, picker=True)
-ax.plot(np.arange(3, 13), avg_percent_diffs, c='red', marker='o')
+sc = ax.scatter(np.repeat(np.arange(3, 13), len(all_sse_errors) // 10), all_sse_errors, c='blue', alpha=0.5, picker=True)
+ax.plot(np.arange(3, 13), avg_sse_errors, c='red', marker='o')
 ax.set_xlabel('Number of Sample Points')
-ax.set_ylabel('Total Average % Difference')
-ax.set_title('Total Average % Difference vs Number of Sample Points')
+ax.set_ylabel('Total Average Sum of Squared Errors (W^2)')
+ax.set_title('Total Average Sum of Squared Errors vs Number of Sample Points')
 ax.grid(True)
 
 # Connect the pick event to the on_pick function and pass the input_folder as a parameter
