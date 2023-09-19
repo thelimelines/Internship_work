@@ -138,7 +138,7 @@ output_folder = "Reconstruction algorithms\Benchmark_data/"
 
 # Initialize result storage
 trial_count = 0 # Counter variable
-trials = 10 # Number of trials per sample
+trials = 100 # Number of trials per sample
 total_trials = (13 - 3) * trials #TO BE REPLACED WITH RANGE VARIABLES
 start_time = time.time()
 bar_length = 100
@@ -181,7 +181,7 @@ for n_points in range(3, 13):
         
         # Optimization
         bounds = [(0, max(original_weights))] * len(unique_modes) + [(0, 180)] * len(unique_modes)
-        result = dual_annealing(objective_scalar, bounds, args=(sampled_x, sampled_y, even_symmetric_fourier_coefficients_corrected), maxiter=10, initial_temp=5230)
+        result = dual_annealing(objective_scalar, bounds, args=(sampled_x, sampled_y, even_symmetric_fourier_coefficients_corrected), maxiter=1000, initial_temp=5230)
         recovered_params = result.x
         recovered_weights = recovered_params[:len(unique_modes)]
         recovered_shifts = recovered_params[len(unique_modes):]

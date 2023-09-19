@@ -91,8 +91,8 @@ all_sse_errors = pd.read_csv(f"{input_folder}all_sse_errors.csv")['all_sse_error
 
 # Create the main interactive plot
 fig, ax = plt.subplots(figsize=(10, 6))
-sc = ax.scatter(np.repeat(np.arange(3, 13), len(all_sse_errors) // 10), all_sse_errors, c='blue', alpha=0.5, picker=True)
-ax.plot(np.arange(3, 13), avg_sse_errors, c='red', marker='o')
+sc = ax.scatter(np.repeat(np.arange(2, 12), len(all_sse_errors) // 10), all_sse_errors, c='blue', alpha=0.5, picker=True)
+ax.plot(np.arange(2, 12), avg_sse_errors, c='red', marker='o')
 ax.set_xlabel('Number of Sample Points')
 ax.set_ylabel('Total Average Sum of Squared Errors (W^2)')
 ax.set_title('Total Average Sum of Squared Errors vs Number of Sample Points')
